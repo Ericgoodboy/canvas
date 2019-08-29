@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="app"></canvas>
+    <script>
+        (function () {
+            var canvas = document.getElementById("app")
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            var ctx = canvas.getContext("2d");
+            function Pointer(x,y){
+                this.x = x;
+                this.y = y;
+            }
+            var sp = new Pointer(0,canvas.height/2)
+            var p1 = new Pointer(230,30)
+            var p2 = new Pointer(150,50)
+            var ep = new Pointer(canvas.width,canvas.height/2)
+            function drawbezierCurveTo() {
+                ctx.beginPath();
+               
+                ctx.moveTo(sp.x, sp.y);
+                ctx.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, ep.x, ep.y);
+                ctx.stroke();
+                ctx.fillStyle = 'blue';
+                // start point
+                ctx.fillRect(sp.x, sp.y, 10, 10);
+                // end point
+                ctx.fillRect(ep.x, ep.y, 10, 10);
+
+                ctx.fillStyle = 'red';
+                // control point one
+                ctx.fillRect(p1.x, p1.y, 10, 10);
+                // control point two
+                ctx.fillRect(p2.x, p2.y, 10, 10);
+            }
+            drawbezierCurveTo()
+            window.onmousemove=function(e){
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                p1.x = e.clientX;
+                p1.y = e.clientY;
+                p2.x = e.screenX;
+                p2.y = e.screenY;
+                drawbezierCurveTo()
+            }
+        })()
+    </script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #app {
+            margin: 0;
+            background: #333;
+        }
+    </style>
+</body>
+
+</html>

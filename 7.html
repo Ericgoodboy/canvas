@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>demo</title>
+</head>
+
+<body>
+    <canvas id="app"></canvas>
+    <script>
+        (function () {
+            var canvas = document.getElementById("app")
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            var cH = canvas.height-50
+            var ctx = canvas.getContext("2d");
+            function Pointer(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+            function Circle(x, y, r) {
+                this.x = x;
+                this.y = y;
+                this.r = r;
+            }
+            var p1 = new Pointer(30, 10)
+            var pl = new Pointer(20, 40)
+            var pr = new Pointer(40, 40)
+            var pc = new Pointer(30, 40)
+            function RainDorp(x, y, width, height) {
+                this.p1 = new Pointer(x, y - (height - width / 2))
+                this.pl = new Pointer(x - width / 2, y)
+                this.pr = new Pointer(x + width / 2, y)
+                this.pc = new Pointer(x, y)
+                this.width = width;
+                this.height = height;
+                this.x=x;
+                this.y=y;
+                this.cy = 0.3
+            }
+
+            RainDorp.prototype.draw = function () {
+                var p1 = this.p1;
+                var pl = this.pl;
+                var pr = this.pr;
+                var pc = this.pc;
+
+                var color = ctx.createRadialGradient(pc.x, pc.y, this.width / 2, p1.x, p1.y, 0)
+                color.addColorStop(0, "#3699")
+                color.addColorStop(1, "#3694")
+                ctx.fillStyle = color;
+
+                ctx.save();
+                ctx.beginPath(); //开始路径
+                ctx.moveTo(p1.x, p1.y);
+                ctx.bezierCurveTo(pc.x, pc.y - this.width * 0.15, pc.x + this.width / 2, pc.y - this.width * 0.35, pr.x, pr.y);
+                // (pc.x, pc.y, p1.x, p1.y);
+                ctx.arc(pc.x, pc.y, this.width / 2, 0, 180)
+                ctx.moveTo(pl.x, pl.y);
+                ctx.bezierCurveTo(pc.x - this.width / 2, pc.y - this.width * 0.35, pc.x, pc.y - this.width * 0.15, p1.x, p1.y);
+                ctx.closePath(); //结束路径
+                ctx.clip();
+                ctx.fill();
+                ctx.restore();
+            }
+            all = []
+
+            for (var i = 0; i < 100; i++) {
+                all[i] = new RainDorp(Math.random() * canvas.width, Math.random() * canvas.height, 10, 20)
+            }
+            for (var i = 0; i < 100; i++) {
+                all[i].draw()
+            }
+            g = 0.02
+            let moveCircle = function () {
+                var self = this;
+                ctx.clearRect(0, 0, canvas.width, canvas.height); //清除画布
+                //模拟的速度增量
+                // this.drawLine(0,this.Hiv,this.cW,this.Hiv)
+                for (var i = 0; i < 100; i++) { //上一个点
+                    // self.data[i].x += self.data[i].cx;
+                    cy=all[i].cy
+                    all[i] =new RainDorp(all[i].x,all[i].y+all[i].cy,10,20) ;
+                    //边界值判断
+                    all[i].cy =cy+g
+                    // if(self.data[i].x > self.cW || self.data[i].x < 0) {
+                    // 	self.data[i].cx = -self.data[i].cx
+                    // }
+                    if(all[i].y > cH) {
+                    	all[i]=new RainDorp(all[i].x,0,10,20)
+                        // self.data[i].cy=Math.random() * 0.6
+                    }
+                    // this.drawCircle(self.data[i].x, self.data[i].y);
+                    // this.drawTrack(self.data[i].x, self.data[i].y,20)
+                    //用勾股定理判断是否连线
+                    // for(var j = i + 1; j < self.num; j++) { //下一个点
+                    // 	if(Math.pow(self.data[i].x - self.data[j].x, 2) + Math.pow(self.data[i].y - self.data[j].y, 2) < 50 * 50) {
+                    // 		self.drawLine(self.data[i].x, self.data[i].y, self.data[j].x, self.data[j].y);
+                    // 	}
+                    // }
+                }
+                for (var i = 0; i < 100; i++) {
+                    all[i].draw()
+                }
+                // console.log("---")
+                
+            }
+            setInterval(function() {
+					moveCircle();
+				}, 3)
+            
+
+
+        })()
+    </script>
+    <style>
+        #app{
+            background: #333;
+        }
+    </style>
+</body>
+
+</html>

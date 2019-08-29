@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>测试渐变</title>
+</head>
+
+<body>
+    <canvas id="app"></canvas>
+    <script>
+        (function () {
+            var canvas = document.getElementById("app")
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            var context = canvas.getContext("2d");
+            function Pointer(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+            function Circle(x, y, r) {
+                this.x = x;
+                this.y = y;
+                this.r = r;
+            }
+            var c1 = new Circle(100, 100, 50)
+            var c2 = new Circle(100, 100, 43)
+            var p1 = new Pointer(0, 0)
+
+            var color = context.createRadialGradient(c1.x, c1.y, c1.r, c2.x, c2.y, c2.r);
+            color.addColorStop(0, "#333")
+            color.addColorStop(.3, "#875")
+            color.addColorStop(1, "#444")
+            context.fillStyle = color;
+            context.fillRect(p1.x, p1.y, 1000, 1000);
+            // var img = new Image();
+            // img.src = 'https://mdn.mozillademos.org/files/222/Canvas_createpattern.png';
+            // img.onload = function () {
+            //     var pattern = context.createPattern(img, 'no-repeat');
+            //     context.fillStyle = pattern;
+            //     context.fillRect(0, 0, 400, 400);
+            // };
+
+        })()
+    </script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #app {
+            margin: 0;
+            /* background: #333; */
+        }
+    </style>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>demo</title>
+</head>
+<body>
+    <canvas id="app"></canvas>
+    <script>
+        (function(){
+            var canvas = document.getElementById("app")
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            var ctx = canvas.getContext("2d");
+            function Pointer(x,y){
+                this.x = x;
+                this.y = y;
+            }
+            function Circle(x,y,r){
+                this.x = x;
+                this.y = y;
+                this.r = r;
+            }
+        })()
+    </script>
+    <style>
+        #app{}
+    </style>
+</body>
+</html>

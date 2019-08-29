@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" style="position:absolute;top:0px;left:0px;z-index:1;"></canvas>
+    <script>
+        (function(){
+            function Stayrry() { //构造函数
+				//构造函数里面的this是可以被原型调用的，this是指向你当前实例化的对象的
+				this.cxt = canvas.getContext('2d'); //构建画布
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+                this.Hiv = canvas.height-50
+				this.cW = canvas.width;
+				this.cH = canvas.height;
+				this.num = 100;
+				this.data = []; //存储粒子的属性
+			}
+			Stayrry.prototype = { //原型
+				//初始化粒子:实心圆
+				init: function() {
+					for(var i = 0; i < this.num; i++) {
+						this.data[i] = {
+							x: Math.random() * this.cW,
+							y: Math.random() * this.cH,
+							// y:  this.Hiv-20,
+							cx:0,// Math.random() * 0.6 - 0.3,
+							cy: 0.4 * 0.6
+						}
+						this.drawCircle(this.data[i].x, this.data[i].y);
+					}
+					console.log(this.data);
+				},
+                mouseMove:function(e){
+                    // console.log(e)
+                    var x = e.screenX;
+                    var y = e.clientY;
+                    console.log(this.cxt)
+                    this.data[0].x = x;
+					this.data[0].y = y;
+                }
+                ,
+				//绘制粒子
+				drawCircle: function(x, y) {
+					var cxt = this.cxt;
+                    r = this.Hiv>y?3:(y-this.Hiv)*.3
+                    y=this.Hiv>y?y:this.Hiv
+					cxt.save(); //保存路径
+                    var color = cxt.createRadialGradient(x,y,0,x,y,r)
+                    color.addColorStop(0,"#3699")
+                    color.addColorStop(1,"#3694")
+
+					cxt.fillStyle = color;
+					cxt.beginPath(); //开始路径
+                    
+                    
+                    console.log(r)
+					cxt.arc(x, y, r, 0, Math.PI * 2, false);
+					cxt.closePath(); //结束路径
+					cxt.fill(); //填充方法
+					cxt.restore(); //释放路径
+				},
+				//绘制线条
+				drawLine: function(x1, y1, x2, y2) {
+					var cxt = this.cxt;
+					var color = cxt.createLinearGradient(x1, y1, x2, y2);
+					color.addColorStop(0, "#369");
+					color.addColorStop(1, "#89f");
+					cxt.save();
+					cxt.strokeStyle = color;
+					cxt.beginPath();
+					cxt.moveTo(x1, y1);
+					cxt.lineTo(x2, y2);
+					cxt.closePath(); //结束路径
+					cxt.stroke(); //线条方法
+					cxt.restore(); //释放路径
+				},
+                drawTrack: function(x,y,l) {
+                    var x1=x;
+                    var y1=y>this.Hiv?this.Hiv:y;
+                    var x2=x;
+                    var y2=y-l>this.Hiv?this.Hiv:y-l;
+					var cxt = this.cxt;
+					var color = cxt.createLinearGradient(x1, y1, x2, y2);
+					color.addColorStop(0, "#369");
+					color.addColorStop(1, "#89f");
+					cxt.save();
+					cxt.strokeStyle = color;
+					cxt.beginPath();
+					cxt.moveTo(x1, y1);
+					cxt.lineTo(x2, y2);
+					cxt.closePath(); //结束路径
+					cxt.stroke(); //线条方法
+					cxt.restore(); //释放路径
+				},
+				//粒子运动
+                 g:0.018,
+				moveCircle: function() {
+					var self = this;
+					self.cxt.clearRect(0, 0, self.cW, self.cH); //清除画布
+					//模拟的速度增量
+                    this.drawLine(0,this.Hiv,this.cW,this.Hiv)
+					for(var i = 0; i < self.num; i++) { //上一个点
+						// self.data[i].x += self.data[i].cx;
+						self.data[i].y += self.data[i].cy;
+						//边界值判断
+                        self.data[i].cy +=self.g
+						if(self.data[i].x > self.cW || self.data[i].x < 0) {
+							self.data[i].cx = -self.data[i].cx
+						}
+						if(self.data[i].y > self.cH || self.data[i].y < 0) {
+							self.data[i].y = 0;
+                            self.data[i].cy=Math.random() * 0.6
+						}
+						this.drawCircle(self.data[i].x, self.data[i].y);
+                        this.drawTrack(self.data[i].x, self.data[i].y,20)
+						//用勾股定理判断是否连线
+						// for(var j = i + 1; j < self.num; j++) { //下一个点
+						// 	if(Math.pow(self.data[i].x - self.data[j].x, 2) + Math.pow(self.data[i].y - self.data[j].y, 2) < 50 * 50) {
+						// 		self.drawLine(self.data[i].x, self.data[i].y, self.data[j].x, self.data[j].y);
+						// 	}
+						// }
+					}
+				}
+ 
+			}
+			var stayrry = new Stayrry(); //生成的实例化对象,new出来的对象可以调用原型上的方法\
+			stayrry.init();
+			setInterval(function() {
+					stayrry.moveCircle();
+				}, 3)
+				//			canvas:基于原生js操控
+				//				1.可以取代页面中大量生成dom节点的操作
+				//				2.大屏数据展示
+				//				3.游戏
+				//				4.webgl/three.js基于canvas
+            // document.onmousemove = function(e){
+            //     stayrry.mouseMove(e)
+            //     console.log(e)
+            // }
+        })()
+    </script>    
+</body>
+<style>
+*{
+
+}
+</style>
+</html>
