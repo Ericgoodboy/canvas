@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+ 
+	<head>
+		<meta charset="utf-8" />
+		<title>canvas背景连线</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" href="css/common.css">
+	</head>
+	<style type="text/css">
+		body {
+			padding-top: constant(safe-area-inset-top);   
+			padding-right: constant(safe-area-inset-right);             
+			padding-bottom: constant(safe-area-inset-bottom);     
+		}
+		
+		#canvas {
+			display: block;
+			background: #000;
+			margin: 0 auto;
+			
+		}
+	</style>
+ 
+	<body>
+		<!--------画布------->
+		<canvas id="canvas"></canvas>
+ 
+		<script>
+			// 面向对象组合模式：构造函数放私有属性  原型里面放公共的方法(除objcet外，其余的都有原型)
+			function Stayrry() { //构造函数
+				//构造函数里面的this是可以被原型调用的，this是指向你当前实例化的对象的
+				this.cxt = canvas.getContext('2d'); //构建画布
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				this.cW = canvas.width;
+				this.cH = canvas.height;
+				this.num = 250;
+				this.data = []; //存储粒子的属性
+			}
+			Stayrry.prototype = { //原型
+				//初始化粒子:实心圆
+				init: function() {
+					for(var i = 0; i < this.num; i++) {
+						this.data[i] = {
+							x: Math.random() * this.cW,
+							y: Math.random() * this.cH,
+							cx: Math.random() * 0.6 - 0.3,
+							cy: Math.random() * 0.6 - 0.3
+						}
+						this.drawCircle(this.data[i].x, this.data[i].y);
+					}
+					console.log(this.data);
+				},
+                mouseMove:function(e){
+                    // console.log(e)
+                    var x = e.screenX;
+                    var y = e.clientY;
+                    console.log(this.cxt)
+                    this.data[0].x = x;
+					this.data[0].y = y;
+                }
+                ,
+				//绘制粒子
+				drawCircle: function(x, y) {
+					var cxt = this.cxt;
+					cxt.save(); //保存路径
+					cxt.fillStyle = "#3694";
+					cxt.beginPath(); //开始路径
+					cxt.arc(x, y, 3, 0, Math.PI * 2, false);
+					cxt.closePath(); //结束路径
+					cxt.fill(); //填充方法
+					cxt.restore(); //释放路径
+				},
+				//绘制线条
+				drawLine: function(x1, y1, x2, y2) {
+					var cxt = this.cxt;
+					var color = cxt.createLinearGradient(x1, y1, x2, y2);
+					color.addColorStop(0, "#369");
+					color.addColorStop(1, "#89f");
+					cxt.save();
+					cxt.strokeStyle = color;
+					cxt.strokeWidth = 1
+					cxt.beginPath();
+					cxt.moveTo(x1, y1);
+					cxt.lineTo(x2, y2);
+					cxt.closePath(); //结束路径
+					cxt.stroke(); //线条方法
+					cxt.restore(); //释放路径
+				},
+				//粒子运动
+				moveCircle: function() {
+					var self = this;
+					self.cxt.clearRect(0, 0, self.cW, self.cH); //清除画布
+					//模拟的速度增量
+					for(var i = 0; i < self.num; i++) { //上一个点
+						self.data[i].x += self.data[i].cx;
+						self.data[i].y += self.data[i].cy;
+						//边界值判断
+						if(self.data[i].x > self.cW || self.data[i].x < 0) {
+							self.data[i].cx = -self.data[i].cx
+						}
+						if(self.data[i].y > self.cH || self.data[i].y < 0) {
+							self.data[i].cy = -self.data[i].cy
+						}
+						this.drawCircle(self.data[i].x, self.data[i].y);
+						//用勾股定理判断是否连线
+						for(var j = i + 1; j < self.num; j++) { //下一个点
+							if(Math.pow(self.data[i].x - self.data[j].x, 2) + Math.pow(self.data[i].y - self.data[j].y, 2) < 50 * 50) {
+								self.drawLine(self.data[i].x, self.data[i].y, self.data[j].x, self.data[j].y);
+							}
+						}
+					}
+				}
+ 
+			}
+			var stayrry = new Stayrry(); //生成的实例化对象,new出来的对象可以调用原型上的方法\
+			stayrry.init();
+			setInterval(function() {
+					stayrry.moveCircle();
+				}, 3)
+				//			canvas:基于原生js操控
+				//				1.可以取代页面中大量生成dom节点的操作
+				//				2.大屏数据展示
+				//				3.游戏
+				//				4.webgl/three.js基于canvas
+            document.onmousemove = function(e){
+                stayrry.mouseMove(e)
+                console.log(e)
+            }
+
+		</script>
+	</body>
+ 
+</html>
